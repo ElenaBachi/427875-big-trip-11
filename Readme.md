@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Елена Бачи](https://up.htmlacademy.ru/ecmascript/11/user/427875).
-* Наставник: `Неизвестно`.
+* Наставник: [Василиса Медведенко](https://htmlacademy.ru/profile/id1268845).
 
 ---
 
