@@ -305,18 +305,18 @@ const render = (container, template, place = `afterbegin`) => {
 };
 
 const siteMainElement = document.querySelector(`.trip-main`);
-render(siteMainElement,createTripCost());
+render(siteMainElement, createTripCost());
 render(siteMainElement, createTripInfo());
 
-const  siteMainMenu = siteMainElement.querySelector(`.trip-controls`);
-render(siteMainMenu,createFilterTemplate());
-render(siteMainMenu,createMenuTemplate());
+const siteMainMenu = siteMainElement.querySelector(`.trip-controls`);
+render(siteMainMenu, createFilterTemplate());
+render(siteMainMenu, createMenuTemplate());
 
 const pageMain = document.querySelector(`.page-main`);
 const tripInfo = pageMain.querySelector(`.trip-events`);
 
 for (let i = 0; i < TRIP_POINT_COUNT; i++) {
-  render(tripInfo,createTripPoint());
+  render(tripInfo, createTripPoint());
 }
-render(tripInfo,createTripEditTemplate());
-render(tripInfo,createSortControlTemplate());
+render(tripInfo, createTripEditTemplate());
+render(tripInfo, createSortControlTemplate());
