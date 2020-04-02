@@ -4,19 +4,17 @@ const TRIP_POINT_COUNT = 3;
 
 const createTripInfo = () => {
   return (
-    `<div class="trip-info__main">
-      <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
+    `<section class="trip-main__trip-info  trip-info">
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
 
-      <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;20</p>
-    </div>`
-  );
-};
+        <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;20</p>
+      </div>
 
-const createTripCost = () => {
-  return (
-    `<p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">1230</span>
-    </p>`
+      <p class="trip-info__cost">
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">1230</span>
+      </p>
+    </section>`
   );
 };
 
@@ -305,7 +303,6 @@ const render = (container, template, place = `afterbegin`) => {
 };
 
 const siteMainElement = document.querySelector(`.trip-main`);
-render(siteMainElement, createTripCost());
 render(siteMainElement, createTripInfo());
 
 const siteMainMenu = siteMainElement.querySelector(`.trip-controls`);
