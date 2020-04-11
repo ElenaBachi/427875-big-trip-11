@@ -1,4 +1,4 @@
-import {getRandomArrayElement, getRandomArrayLength, generateImgGallery, getRandomTime, generateDurationTime} from "../utils.js";
+import {getRandomIntegerNumber, getRandomArrayElement, getRandomArrayLength, generateImgGallery, getRandomTime, generateDurationTime} from "../utils.js";
 
 const TripTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
@@ -25,9 +25,15 @@ const DefaultOffers = {
   "train": false,
 };
 
+const price = {
+  min: 0,
+  max: 150,
+};
+
 const generateTripPoint = () => {
   return {
     tripType: getRandomArrayElement(TripTypes),
+    tripPrice: getRandomIntegerNumber(price.min, price.max),
     destination: {
       city: getRandomArrayElement(Destinations),
       description: getRandomArrayLength(DescriptionItems),

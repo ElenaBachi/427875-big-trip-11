@@ -60,7 +60,7 @@ export const generateImgGallery = () => {
   return getRandomArrayLength(eventPhotos);
 };
 
-const getRandomIntegerNumber = (min, max) => {
+export const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 

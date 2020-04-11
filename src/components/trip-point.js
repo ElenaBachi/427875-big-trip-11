@@ -1,7 +1,7 @@
 import {MONTH_NAMES, stopTypes} from "../const.js";
 
 export const createTripPointTemplate = (tripPoint, tripCount) => {
-  const {tripType, destination, /* isFavorite */ dueDate, timeFrom, timeTo, duration} = tripPoint;
+  const {tripType, tripPrice, destination, /* isFavorite */ dueDate, timeFrom, timeTo, duration} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
 
@@ -34,7 +34,7 @@ export const createTripPointTemplate = (tripPoint, tripCount) => {
               </div>
 
               <p class="event__price">
-                &euro;&nbsp;<span class="event__price-value">20</span>
+                &euro;&nbsp;<span class="event__price-value">${tripPrice}</span>
               </p>
 
               <h4 class="visually-hidden">Offers:</h4>
