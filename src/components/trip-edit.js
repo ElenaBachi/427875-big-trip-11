@@ -31,9 +31,7 @@ const createOfferListMarkup = (availableOffers, checkedOffers) => {
 
   return availableOffers
   .map((offer, i) => {
-    const offerName = availableOffers[i].name;
-    const offerTitle = availableOffers[i].title;
-    const offerPrice = availableOffers[i].price;
+    const [offerName, offerTitle, offerPrice] = [availableOffers[i].name, availableOffers[i].title, availableOffers[i].price];
     return (
       `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerName}-${i}" type="checkbox" name="event-offer-${offerName}" ${isOfferChecked}>
@@ -65,7 +63,7 @@ export const createTripEditTemplate = (tripPoint) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${tripType}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${tripType.toLowerCase()}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 

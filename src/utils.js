@@ -1,3 +1,18 @@
+export const getRandomIntegerNumber = (min, max) => {
+  return min + Math.floor(Math.random() * (max - min));
+};
+
+export const getRandomArrayElement = (array) => {
+  const randomIndex = getRandomIntegerNumber(0, array.length);
+
+  return array[randomIndex];
+};
+
+export const getRandomArrayLength = (array) => {
+  const newLength = getRandomIntegerNumber(1, array.length);
+  return array.slice(0, newLength);
+};
+
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
@@ -18,59 +33,45 @@ export const formatDate = (date) => {
 };
 
 export const getRandomTime = () => {
-  const hours = castTimeFormat(getRandomIntegerNumber(0, 23));
-  const minutes = castTimeFormat(getRandomIntegerNumber(0, 59));
+  const targetDate = new Date();
+  const sign = Math.random() > 0.5 ? 1 : -1;
+  const diffValue = sign * getRandomIntegerNumber(0, 8);
 
-  return `${hours}:${minutes}`;
-};
-
-const getTime = (time) => {
-  const timeHours = time.split(`:`)[0];
-  const timeMinutes = time.split(`:`)[1];
-
-  return new Date(0, 0, 0, timeHours, timeMinutes);
+  targetDate.setHours(targetDate.getHours() + diffValue);
+  targetDate.setMinutes(targetDate.getMinutes() + diffValue);
+  return targetDate;
 };
 
 export const generateDurationTime = (timeFrom, timeTo) => {
-  let timeDiff = getTime(timeTo) - getTime(timeFrom);
-  let hours;
-  let minutes;
+  const TimeValues = {
+    MILLISEC: 1000,
+    MIN: 60,
+    HOURS: 60,
+  };
 
-  if (timeDiff > 0) {
-    hours = Math.floor(timeDiff / 3600000) + `H`;
-    minutes = Math.round(timeDiff / 60000) - parseInt(hours, 10) * 60 + `M`;
+  const start = new Date(timeFrom);
+  const end = new Date(timeTo);
+  const diffInMinutes = (end - start) / (TimeValues.MILLISEC * TimeValues.MIN);
+  const durationHours = Math.floor(diffInMinutes / TimeValues.HOURS);
+  const durationMinutes = diffInMinutes - durationHours * TimeValues.MIN;
+
+  if (diffInMinutes === 0) {
+    return `1D`;
+  }
+
+  if (durationMinutes === 0) {
+    return `${durationHours}H`;
   } else {
-    hours = (24 - Math.floor(timeDiff / 3600000)) + `H`;
-    minutes = (60 - Math.round(timeDiff / 60000) - parseInt(hours, 10) * 60) + `M`;
+    return `${durationHours}H ${durationMinutes}M `;
   }
-
-  let result = `${hours} ${minutes}`;
-  return result;
 };
 
-export const generateImgGallery = () => {
-  const MAX_IMG_COUNT = 5;
-  const eventPhotos = [];
+export const generateImgGallery = (count) => {
+  const imgSrcArray = new Array(count). fill(``).map(() => {
+    return `http://picsum.photos/248/152?r=${Math.random()}`;
+  });
 
-  for (let i = 0; i < MAX_IMG_COUNT; i++) {
-    const imgSrc = `http://picsum.photos/248/152?r=${Math.random()}`;
-    const eventPhoto = `<img class="event__photo" src="${imgSrc}" alt="Event photo">`;
-    eventPhotos.push(eventPhoto);
-  }
-  return getRandomArrayLength(eventPhotos);
-};
-
-export const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min));
-};
-
-export const getRandomArrayElement = (array) => {
-  const randomIndex = getRandomIntegerNumber(0, array.length);
-
-  return array[randomIndex];
-};
-
-export const getRandomArrayLength = (array) => {
-  const newLength = getRandomIntegerNumber(1, array.length);
-  return array.slice(0, newLength);
+  return new Array(count).fill().map((it, i) => {
+    return `<img class="event__photo" src="${imgSrcArray[i]}" alt="Event photo">`;
+  });
 };

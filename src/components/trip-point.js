@@ -1,13 +1,13 @@
 import {MONTH_NAMES, stopTypes} from "../const.js";
+import {generateDurationTime, formatTime} from "../utils.js";
 
 export const createTripPointTemplate = (tripPoint, tripCount) => {
-  const {tripType, tripPrice, destination, /* isFavorite */ dueDate, timeFrom, timeTo, duration} = tripPoint;
+  const {tripType, tripPrice, destination, /* isFavorite */ dueDate, timeFrom, timeTo, offer} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
 
   const date = `${MONTH_NAMES[dueDate.getMonth()]} ${dueDate.getDate()}`;
-  const tripTimeFrom = timeFrom;
-  const tripTimeTo = timeTo;
+  const duration = generateDurationTime(timeFrom, timeTo);
 
   return (
     `<ul class="trip-days">
@@ -26,9 +26,9 @@ export const createTripPointTemplate = (tripPoint, tripCount) => {
 
               <div class="event__schedule">
                 <p class="event__time">
-                  <time class="event__start-time" datetime="2019-03-18T10:30">${tripTimeFrom}</time>
+                  <time class="event__start-time" datetime="2019-03-18T10:30">${formatTime(timeFrom)}</time>
                   &mdash;
-                  <time class="event__end-time" datetime="2019-03-18T11:00">${tripTimeTo}</time>
+                  <time class="event__end-time" datetime="2019-03-18T11:00">${formatTime(timeTo)}</time>
                 </p>
                 <p class="event__duration">${duration}</p>
               </div>
@@ -40,9 +40,9 @@ export const createTripPointTemplate = (tripPoint, tripCount) => {
               <h4 class="visually-hidden">Offers:</h4>
               <ul class="event__selected-offers">
                 <li class="event__offer">
-                  <span class="event__offer-title">Order uber</span>
+                  <span class="event__offer-title">${offer.title}</span>
                   &plus;
-                  &euro;&nbsp;<span class="event__offer-price">20</span>
+                  &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                  </li>
               </ul>
 

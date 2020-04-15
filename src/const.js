@@ -1,6 +1,21 @@
 export const eventTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`];
 export const stopTypes = [`Check-in`, `Sightseeing`, `Restaurant`];
 
+export const MONTH_NAMES = [
+  `JAN`,
+  `FEB`,
+  `MAR`,
+  `APR`,
+  `MAY`,
+  `JUNE`,
+  `JULY`,
+  `AUG`,
+  `SEP`,
+  `OCT`,
+  `NOV`,
+  `DEC`,
+];
+
 export const offers = [
   {
     name: `luggage`,
@@ -26,20 +41,10 @@ export const offers = [
     name: `train`,
     title: `Travel by train`,
     price: 40,
-  }
-];
-
-export const MONTH_NAMES = [
-  `JAN`,
-  `FEB`,
-  `MAR`,
-  `APR`,
-  `MAY`,
-  `JUNE`,
-  `JULY`,
-  `AUG`,
-  `SEP`,
-  `OCT`,
-  `NOV`,
-  `DEC`,
+  },
+  {
+    name: `uber`,
+    title: `Order Uber`,
+    price: 20,
+  },
 ];
