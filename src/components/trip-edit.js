@@ -1,5 +1,5 @@
 import {eventTypes, stopTypes, offers} from "../const.js";
-import {formatTime, formatDate} from "../utils.js";
+import {createElement, formatTime, formatDate} from "../utils.js";
 
 const createTripTypesMarkup = (tripTypes) => {
   return tripTypes
@@ -31,25 +31,25 @@ const createOfferListMarkup = (availableOffers, checkedOffers) => {
 
   return availableOffers
   .map((offer, i) => {
-    const [offerName, offerTitle, offerPrice] = [availableOffers[i].name, availableOffers[i].title, availableOffers[i].price];
+    const {name, title, price} = offer;
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerName}-${i}" type="checkbox" name="event-offer-${offerName}" ${isOfferChecked}>
-        <label class="event__offer-label" for="event-offer-${offerName}-1">
-          <span class="event__offer-title">${offerTitle}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${i}" type="checkbox" name="event-offer-${name}" ${isOfferChecked}>
+        <label class="event__offer-label" for="event-offer-${name}-1">
+          <span class="event__offer-title">${title}</span>
           &plus;
-          &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+          &euro;&nbsp;<span class="event__offer-price">${price}</span>
         </label>
       </div>`
     );
   }).join(`\n`);
 };
 
-export const createTripEditTemplate = (tripPoint) => {
-  const {destination, dueDate, tripType, checkedOffers} = tripPoint;
+const createTripPointEditTemplate = (tripPoint) => {
+  const {destination, tripDate, tripType, checkedOffers} = tripPoint;
 
-  const date = formatDate(dueDate);
-  const time = formatTime(dueDate);
+  const date = formatDate(tripDate);
+  const time = formatTime(tripDate);
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
 
@@ -140,3 +140,26 @@ export const createTripEditTemplate = (tripPoint) => {
     </form>`
   );
 };
+
+export default class TripPointEdit {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripPointEditTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

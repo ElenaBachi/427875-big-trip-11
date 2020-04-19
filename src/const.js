@@ -47,4 +47,19 @@ export const offers = [
     title: `Order Uber`,
     price: 20,
   },
+  {
+    name: `car`,
+    title: `Rent a car`,
+    price: 200,
+  },
+  {
+    name: `tickets`,
+    title: `Book tickets`,
+    price: 40,
+  },
+  {
+    name: `lunch`,
+    title: `Lunch in city`,
+    price: 30,
+  },
 ];

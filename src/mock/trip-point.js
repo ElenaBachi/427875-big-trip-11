@@ -1,4 +1,4 @@
-import {getRandomIntegerNumber, getRandomArrayElement, getRandomArrayLength, generateImgGallery, getRandomTime, formatTime} from "../utils.js";
+import {getRandomIntegerNumber, getRandomArrayElement, getRandomArrayLength, generateImgGallery, getRandomTime, getRandomDate} from "../utils.js";
 import {offers} from "../const.js";
 
 const TripTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
@@ -19,8 +19,8 @@ const DescriptionItems = [
 ];
 
 const DefaultOffers = {
-  "luggage": false,
-  "comfort": false,
+  "luggage": true,
+  "comfort": true,
   "meal": false,
   "seats": false,
   "train": false,
@@ -31,7 +31,15 @@ const price = {
   max: 150,
 };
 
+const getEndTime = (time) => {
+  const timeTo = new Date(time);
+  timeTo.setMilliseconds(getRandomIntegerNumber(300000, 8280000));
+  return timeTo;
+};
+
 const generateTripPoint = () => {
+  const timeFrom = getRandomTime();
+  const timeTo = getEndTime(timeFrom);
   return {
     tripType: getRandomArrayElement(TripTypes),
     tripPrice: getRandomIntegerNumber(price.min, price.max),
@@ -40,15 +48,14 @@ const generateTripPoint = () => {
       description: getRandomArrayLength(DescriptionItems),
       photos: generateImgGallery(getRandomIntegerNumber(1, 10)),
     },
-    dueDate: new Date(),
-    timeFrom: getRandomTime(),
-    timeTo: getRandomTime(),
+    tripDate: getRandomDate(),
+    timeFrom,
+    timeTo,
     isFavorite: Math.random() > 0.5,
     offer: getRandomArrayElement(offers),
-    checkedOffers: Object.assign({}, DefaultOffers, {"luggage": Math.random() > 0.5}, {"comfort": Math.random() > 0.5}),
+    checkedOffers: Object.assign({}, DefaultOffers),
   };
 };
-
 
 const generateTripPoints = (count) => {
   return new Array(count).fill(``).map(generateTripPoint);

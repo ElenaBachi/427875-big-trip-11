@@ -1,3 +1,8 @@
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
 export const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
@@ -37,8 +42,20 @@ export const getRandomTime = () => {
   const sign = Math.random() > 0.5 ? 1 : -1;
   const diffValue = sign * getRandomIntegerNumber(0, 8);
 
+  targetDate.setDate(targetDate.getDate() + diffValue);
   targetDate.setHours(targetDate.getHours() + diffValue);
   targetDate.setMinutes(targetDate.getMinutes() + diffValue);
+  return targetDate;
+};
+
+export const getRandomDate = () => {
+  const targetDate = new Date();
+  const sign = Math.random() > 0.5 ? 1 : -1;
+  const diffValue = sign * getRandomIntegerNumber(0, 8);
+
+  targetDate.setFullYear(2019);
+  targetDate.setMonth(targetDate.getDate() + diffValue);
+  targetDate.setDate(targetDate.getDate() + diffValue);
   return targetDate;
 };
 
@@ -53,10 +70,10 @@ export const generateDurationTime = (timeFrom, timeTo) => {
   const end = new Date(timeTo);
   const diffInMinutes = (end - start) / (TimeValues.MILLISEC * TimeValues.MIN);
   const durationHours = Math.floor(diffInMinutes / TimeValues.HOURS);
-  const durationMinutes = diffInMinutes - durationHours * TimeValues.MIN;
+  const durationMinutes = Math.round(diffInMinutes - durationHours * TimeValues.MIN);
 
-  if (diffInMinutes === 0) {
-    return `1D`;
+  if (durationHours === 0) {
+    return `${durationMinutes}M`;
   }
 
   if (durationMinutes === 0) {
@@ -74,4 +91,31 @@ export const generateImgGallery = (count) => {
   return new Array(count).fill().map((it, i) => {
     return `<img class="event__photo" src="${imgSrcArray[i]}" alt="Event photo">`;
   });
+};
+
+export const makeDatetime = (date) => {
+  const currentDate = new Date(date);
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const day = currentDate.getDate();
+
+  return `${year}-${month}-${day}`;
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
 };
