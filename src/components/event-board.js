@@ -1,4 +1,4 @@
-import {createElement} from "../../../taskmanager/src/utils.js";
+import {createElement} from "../utils.js";
 
 const createEventBoardTemplate = () => {
   return (
