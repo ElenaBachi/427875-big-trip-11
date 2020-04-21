@@ -25,13 +25,11 @@ const createEventStopMarkup = (tripTypes) => {
   }).join(`\n`);
 };
 
-const createOfferListMarkup = (availableOffers, checkedOffers) => {
-
-  const isOfferChecked = Object.values(checkedOffers).some(Boolean) ? `checked` : ``;
-
+const createOfferListMarkup = (availableOffers) => {
   return availableOffers
   .map((offer, i) => {
-    const {name, title, price} = offer;
+    const {name, title, price, choosen} = offer;
+    const isOfferChecked = choosen > 0.5 ? `checked` : ``;
     return (
       `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${i}" type="checkbox" name="event-offer-${name}" ${isOfferChecked}>
@@ -46,7 +44,7 @@ const createOfferListMarkup = (availableOffers, checkedOffers) => {
 };
 
 const createTripPointEditTemplate = (tripPoint) => {
-  const {destination, tripDate, tripType, checkedOffers} = tripPoint;
+  const {destination, tripDate, tripType} = tripPoint;
 
   const date = formatDate(tripDate);
   const time = formatTime(tripDate);
@@ -55,7 +53,7 @@ const createTripPointEditTemplate = (tripPoint) => {
 
   const tripTypesMarkup = createTripTypesMarkup(eventTypes);
   const eventStopMarkup = createEventStopMarkup(stopTypes);
-  const offerListMarkup = createOfferListMarkup(offers, checkedOffers);
+  const offerListMarkup = createOfferListMarkup(offers);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">

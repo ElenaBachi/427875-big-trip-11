@@ -5,12 +5,13 @@ import FilterComponent from "./components/filters.js";
 import MenuComponent from "./components/menu.js";
 import TripPointComponent from "./components/trip-point.js";
 import TripPointEditComponent from "./components/trip-edit.js";
+import NoEventsComponent from "./components/no-events.js";
 import SortComponent from "./components/sorting.js";
 import {generateTripPoints} from "./mock/trip-point.js";
 import {generateFilters} from "./mock/filter.js";
 import {render, RenderPosition} from "./utils.js";
 
-const TRIP_POINT_COUNT = 21;
+const TRIP_POINT_COUNT = 20;
 const filters = generateFilters();
 const tripPoints = generateTripPoints(TRIP_POINT_COUNT);
 
@@ -25,20 +26,36 @@ tripInfo.remove();
 
 
 const renderEvent = (pointListElement, tripPoint) => {
-  const onEditButtonClick = () => {
+  const replaceEventToEdit = () => {
     pointListElement.replaceChild(tripPointEditComponent.getElement(), tripPointComponent.getElement());
   };
-  const onEditFormSubmit = () => {
+  const replaceEditToEvent = () => {
     pointListElement.replaceChild(tripPointComponent.getElement(), tripPointEditComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      replaceEditToEvent();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
   };
 
   const tripPointComponent = new TripPointComponent(tripPoint);
   const editButton = tripPointComponent.getElement().querySelector(`.event__rollup-btn`);
-  editButton.addEventListener(`click`, onEditButtonClick);
+  editButton.addEventListener(`click`, () => {
+    replaceEventToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
 
   const tripPointEditComponent = new TripPointEditComponent(tripPoint);
   const editFormButton = tripPointEditComponent.getElement().querySelector(`form`);
-  editFormButton.addEventListener(`sumbit`, onEditFormSubmit);
+  editFormButton.addEventListener(`sumbit`, (evt) => {
+    evt.preventDefault();
+    replaceEditToEvent();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
   render(pointListElement, tripPointComponent.getElement(), RenderPosition.BEFOREEND);
 };
@@ -49,9 +66,16 @@ const renderEventBoard = (boardComponent, events) => {
 
   const tripPointContainer = boardComponent.getElement().querySelector(`.trip-days`);
 
-  events.slice(0, TRIP_POINT_COUNT).forEach((event) => {
-    renderEvent(tripPointContainer, event);
+  events.slice(0, TRIP_POINT_COUNT).forEach((it) => {
+    renderEvent(tripPointContainer, it);
   });
+
+  const event = boardComponent.getElement().querySelector(`.trip-days__item `);
+  const isNoEventsCreated = event === null || event === undefined;
+
+  if (isNoEventsCreated) {
+    render(boardComponent.getElement(), new NoEventsComponent().getElement(), RenderPosition.BEFOREEND);
+  }
 };
 
 render(siteHeaderBlock, new TripInfoComponent().getElement(), RenderPosition.AFTERBEGIN);
@@ -61,13 +85,3 @@ render(siteMainMenu, new MenuComponent().getElement(), RenderPosition.AFTERBEGIN
 const eventBoardComponent = new EventBoardComponent();
 render(pageBodyContainer, eventBoardComponent.getElement(), RenderPosition.BEFOREEND);
 renderEventBoard(eventBoardComponent, tripPoints);
-
-const destinationInfoBlock = eventBoardComponent.querySelector(`.event__section--destination`);
-destinationInfoBlock.classList.add(`visually-hidden`);
-
-const destinationChooseInput = eventBoardComponent.querySelector(`.event__input--destination`);
-// option.value = ???
-destinationChooseInput.onchange = () => {
-  destinationInfoBlock.classList.remove(`visually-hidden`);
-};
-

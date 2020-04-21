@@ -18,14 +18,6 @@ const DescriptionItems = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const DefaultOffers = {
-  "luggage": true,
-  "comfort": true,
-  "meal": false,
-  "seats": false,
-  "train": false,
-};
-
 const price = {
   min: 0,
   max: 150,
@@ -53,7 +45,6 @@ const generateTripPoint = () => {
     timeTo,
     isFavorite: Math.random() > 0.5,
     offer: getRandomArrayElement(offers),
-    checkedOffers: Object.assign({}, DefaultOffers),
   };
 };
 

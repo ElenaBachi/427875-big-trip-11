@@ -10,8 +10,7 @@ const createTripPointTemplate = (tripPoint) => {
   const duration = generateDurationTime(timeFrom, timeTo);
 
   return (
-    `
-    <li class="trip-days__item  day">
+    `<li class="trip-days__item  day">
       <div class="day__info">
         <span class="day__counter">1</span>
         <time class="day__date" datetime="${makeDatetime(date)}">${date}</time>
