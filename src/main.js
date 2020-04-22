@@ -50,8 +50,8 @@ const renderEvent = (pointListElement, tripPoint) => {
   });
 
   const tripPointEditComponent = new TripPointEditComponent(tripPoint);
-  const editFormButton = tripPointEditComponent.getElement().querySelector(`form`);
-  editFormButton.addEventListener(`sumbit`, (evt) => {
+  const editForm = tripPointEditComponent.getElement();
+  editForm.addEventListener(`sumbit`, (evt) => {
     evt.preventDefault();
     replaceEditToEvent();
     document.removeEventListener(`keydown`, onEscKeyDown);
