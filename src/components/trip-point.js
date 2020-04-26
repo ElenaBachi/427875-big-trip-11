@@ -1,7 +1,7 @@
 import {MONTH_NAMES, stopTypes} from "../const.js";
 import {createElement, generateDurationTime, formatTime, makeDatetime} from "../utils.js";
 
-const createTripPointTemplate = (tripPoint) => {
+const createTripPointTemplate = (tripPoint, dayCount) => {
   const {tripType, tripPrice, destination, /* isFavorite */ tripDate, timeFrom, timeTo, offer} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
@@ -12,7 +12,7 @@ const createTripPointTemplate = (tripPoint) => {
   return (
     `<li class="trip-events__item  day">
       <div class="day__info">
-        <span class="day__counter">1</span>
+        <span class="day__counter">${dayCount}</span>
         <time class="day__date" datetime="${makeDatetime(date)}">${date}</time>
       </div>
       <ul class="trip-events__list">
@@ -56,13 +56,14 @@ const createTripPointTemplate = (tripPoint) => {
 };
 
 export default class TripPoint {
-  constructor(tripPoint) {
+  constructor(tripPoint, dayCount) {
     this._tripPoint = tripPoint;
+    this._dayCount = dayCount;
     this._element = null;
   }
 
   getTemplate() {
-    return createTripPointTemplate(this._tripPoint);
+    return createTripPointTemplate(this._tripPoint, this._dayCount);
   }
 
   getElement() {

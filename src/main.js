@@ -13,7 +13,31 @@ import {render, RenderPosition} from "./utils.js";
 
 const TRIP_POINT_COUNT = 20;
 const filters = generateFilters();
-const tripPoints = generateTripPoints(TRIP_POINT_COUNT);
+let tripPoints = generateTripPoints(TRIP_POINT_COUNT);
+
+const tripPointList = tripPoints.sort((a, b) => a.tripDate - b.tripDate)
+.reduce((accumulator, it) => {
+  const time = new Intl.DateTimeFormat(`en-GB`).format(it.tripDate);
+
+  if (!accumulator[time]) {
+    accumulator[time] = [];
+  }
+
+  accumulator[time].push(it);
+
+  return accumulator;
+}, {});
+
+const groupTripPoints = Object.keys(tripPointList)
+.map((date, i) => {
+  return {
+    count: i + 1,
+    date,
+    points: tripPointList[date],
+  };
+});
+
+tripPoints = groupTripPoints;
 
 const siteHeaderBlock = document.querySelector(`.trip-main`);
 const siteMainMenu = siteHeaderBlock.querySelector(`.trip-controls`);
@@ -25,7 +49,7 @@ const tripInfo = siteMainBlock.querySelector(`.trip-events`);
 tripInfo.remove();
 
 
-const renderEvent = (pointListElement, tripPoint) => {
+const renderEvent = (pointListElement, tripPoint, dayCount) => {
   const replaceEventToEdit = () => {
     pointListElement.replaceChild(tripPointEditComponent.getElement(), tripPointComponent.getElement());
   };
@@ -42,7 +66,7 @@ const renderEvent = (pointListElement, tripPoint) => {
     }
   };
 
-  const tripPointComponent = new TripPointComponent(tripPoint);
+  const tripPointComponent = new TripPointComponent(tripPoint, dayCount);
   const editButton = tripPointComponent.getElement().querySelector(`.event__rollup-btn`);
   editButton.addEventListener(`click`, () => {
     replaceEventToEdit();
@@ -51,7 +75,7 @@ const renderEvent = (pointListElement, tripPoint) => {
 
   const tripPointEditComponent = new TripPointEditComponent(tripPoint);
   const editForm = tripPointEditComponent.getElement();
-  editForm.addEventListener(`sumbit`, (evt) => {
+  editForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceEditToEvent();
     document.removeEventListener(`keydown`, onEscKeyDown);
@@ -66,8 +90,8 @@ const renderEventBoard = (boardComponent, events) => {
 
   const tripPointContainer = boardComponent.getElement().querySelector(`.trip-days`);
 
-  events.slice(0, TRIP_POINT_COUNT).forEach((it) => {
-    renderEvent(tripPointContainer, it);
+  events.slice(0, TRIP_POINT_COUNT).map((it, i) => {
+    return renderEvent(tripPointContainer, it.points[i], it.count);
   });
 
   const event = boardComponent.getElement().querySelector(`.trip-days__item `);
