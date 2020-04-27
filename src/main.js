@@ -1,5 +1,7 @@
 import EventBoardComponent from "./components/event-board.js";
-import EventContainerComponent from "./components/trip-points.js";
+import EventContainerComponent from "./components/events-container.js";
+import EventListByDayComponent from "./components/event-list-by-day.js";
+import EventsListComponent from "./components/events-list.js";
 import TripInfoComponent from "./components/trip-info.js";
 import FilterComponent from "./components/filters.js";
 import MenuComponent from "./components/menu.js";
@@ -10,24 +12,25 @@ import SortComponent from "./components/sorting.js";
 import {generateTripPoints} from "./mock/trip-point.js";
 import {generateFilters} from "./mock/filter.js";
 import {render, RenderPosition} from "./utils.js";
+import {MONTH_NAMES} from "./const.js";
 
 const TRIP_POINT_COUNT = 20;
 const filters = generateFilters();
 let tripPoints = generateTripPoints(TRIP_POINT_COUNT);
 
+// Создает объект, где ключ - дата, значение - массив с точками подходящей даты
 const tripPointList = tripPoints.sort((a, b) => a.tripDate - b.tripDate)
 .reduce((accumulator, it) => {
-  const time = new Intl.DateTimeFormat(`en-GB`).format(it.tripDate);
-
+  const time = `${MONTH_NAMES[it.tripDate.getMonth()]} ${it.tripDate.getDate()}`;
   if (!accumulator[time]) {
     accumulator[time] = [];
   }
-
   accumulator[time].push(it);
 
   return accumulator;
 }, {});
 
+// Создает массив, где каждый элемент - объект, ключи: порядковый номер, дата, точки маршрута
 const groupTripPoints = Object.keys(tripPointList)
 .map((date, i) => {
   return {
@@ -49,7 +52,7 @@ const tripInfo = siteMainBlock.querySelector(`.trip-events`);
 tripInfo.remove();
 
 
-const renderEvent = (pointListElement, tripPoint, dayCount) => {
+const renderEvent = (pointListElement, tripPoint) => {
   const replaceEventToEdit = () => {
     pointListElement.replaceChild(tripPointEditComponent.getElement(), tripPointComponent.getElement());
   };
@@ -66,7 +69,7 @@ const renderEvent = (pointListElement, tripPoint, dayCount) => {
     }
   };
 
-  const tripPointComponent = new TripPointComponent(tripPoint, dayCount);
+  const tripPointComponent = new TripPointComponent(tripPoint);
   const editButton = tripPointComponent.getElement().querySelector(`.event__rollup-btn`);
   editButton.addEventListener(`click`, () => {
     replaceEventToEdit();
@@ -90,10 +93,29 @@ const renderEventBoard = (boardComponent, events) => {
 
   const tripPointContainer = boardComponent.getElement().querySelector(`.trip-days`);
 
-  events.slice(0, TRIP_POINT_COUNT).map((it, i) => {
-    return renderEvent(tripPointContainer, it.points[i], it.count);
+  events.slice(0, TRIP_POINT_COUNT).forEach((it) => {
+    render(tripPointContainer, new EventListByDayComponent(it.count, it.date).getElement(), RenderPosition.BEFOREEND);
   });
 
+  const eventListByDay = boardComponent.getElement().querySelectorAll(`.day`);
+
+  eventListByDay.forEach((it) => {
+    render(it, new EventsListComponent().getElement(), RenderPosition.BEFOREEND);
+  });
+
+  const paintPointsByDay = (eventList) => {
+    events.slice(0, TRIP_POINT_COUNT).map((it, i) => {
+      return renderEvent(eventList, it.points[i]);
+    });
+  };
+
+  const eventList = document.querySelectorAll(`.trip-events__list`);
+
+  eventList.forEach((day) => {
+    paintPointsByDay(day);
+  });
+
+  // Если нет точек маршрута:
   const event = boardComponent.getElement().querySelector(`.trip-days__item `);
   const isNoEventsCreated = event === null || event === undefined;
 
