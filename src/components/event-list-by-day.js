@@ -1,10 +1,6 @@
-import {createElement, makeDatetime} from "../utils.js";
-import {MONTH_NAMES} from "../const.js";
+import {createElement} from "../utils.js";
 
 const createEventListByDayTemplate = (dayCount, date) => {
-
-  // const date = `${MONTH_NAMES[tripPoint.tripDate.getMonth()]} ${tripPoint.tripDate.getDate()}`;
-
   return (
     `<li class="trip-days__item  day">
       <div class="day__info">
