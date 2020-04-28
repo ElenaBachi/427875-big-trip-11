@@ -1,5 +1,6 @@
+import AbstractComponent from "./abstract-component.js";
 import {eventTypes, stopTypes, offers} from "../const.js";
-import {createElement, formatTime, formatDate} from "../utils.js";
+import {formatTime, formatDate} from "../utils/common.js";
 
 const createTripTypesMarkup = (tripTypes) => {
   return tripTypes
@@ -143,25 +144,18 @@ const createTripPointEditTemplate = (tripPoint) => {
   );
 };
 
-export default class TripPointEdit {
+export default class TripPointEdit extends AbstractComponent {
   constructor(task) {
+    super();
+
     this._task = task;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripPointEditTemplate(this._task);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(cb) {
+    this.getElement().addEventListener(`submit`, cb);
   }
 }

@@ -1,5 +1,6 @@
+import AbstractComponent from "./abstract-component.js";
 import {stopTypes} from "../const.js";
-import {createElement, generateDurationTime, formatTime, makeDatetime} from "../utils.js";
+import {generateDurationTime, formatTime, makeDatetime} from "../utils/common.js";
 
 const createTripPointTemplate = (tripPoint) => {
   const {tripType, tripPrice, destination, timeFrom, timeTo, offer} = tripPoint;
@@ -46,25 +47,18 @@ const createTripPointTemplate = (tripPoint) => {
   );
 };
 
-export default class TripPoint {
+export default class TripPoint extends AbstractComponent {
   constructor(tripPoint) {
+    super();
+
     this._tripPoint = tripPoint;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripPointTemplate(this._tripPoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(cb) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, cb);
   }
 }
