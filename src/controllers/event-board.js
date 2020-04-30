@@ -44,52 +44,53 @@ const renderEvent = (pointListElement, tripPoint) => {
   render(pointListElement, eventComponent, RenderPosition.BEFOREEND);
 };
 
-const renderEventBoard = (boardComponent, events) => {
-  events = events.slice(0, TRIP_POINT_COUNT);
-  render(boardComponent.getElement(), new SortComponent(), RenderPosition.BEFOREEND);
-  render(boardComponent.getElement(), new EventContainerComponent(), RenderPosition.BEFOREEND);
-
-  const tripPointContainer = boardComponent.getElement().querySelector(`.trip-days`);
-
-  events.forEach((it) => {
-    render(tripPointContainer, new EventListByDayComponent(it.count, it.date), RenderPosition.BEFOREEND);
-  });
-
-  const eventListByDay = boardComponent.getElement().querySelectorAll(`.day`);
-
-  eventListByDay.forEach((it) => {
-    render(it, new EventsListComponent(), RenderPosition.BEFOREEND);
-  });
-
-  const eventList = document.querySelectorAll(`.trip-events__list`);
-
-  events.forEach((event, i) => {
-    event.points.map((point) => {
-      renderEvent(eventList[i], point);
-    });
-  });
-
-  // Если нет точек маршрута:
-  const event = boardComponent.getElement().querySelector(`.trip-days__item `);
-  const isNoEventsCreated = event === null || event === undefined;
-
-  if (isNoEventsCreated) {
-    render(boardComponent.getElement(), new NoEventsComponent(), RenderPosition.BEFOREEND);
-  }
-};
-
 export default class EventBoardController {
   constructor(container) {
     this._container = container;
 
     this._sortComponent = new SortComponent();
     this._eventContainerComponent = new EventContainerComponent();
-    this._eventListByDayComponent = new EventListByDayComponent();
     this._eventsListComponent = new EventsListComponent();
     this._noEventsComponent = new NoEventsComponent();
   }
 
+  getEventListByDay(eventList) {
+    return new EventListByDayComponent(eventList.count, eventList.date);
+  }
+
   render(events) {
-    renderEventBoard(this._container, events);
+    const container = this._container.getElement();
+
+    events = events.slice(0, TRIP_POINT_COUNT);
+    render(container, this._sortComponent, RenderPosition.BEFOREEND);
+    render(container, this._eventContainerComponent, RenderPosition.BEFOREEND);
+
+    const tripPointContainer = container.querySelector(`.trip-days`);
+
+    events.forEach((it) => {
+      render(tripPointContainer, this.getEventListByDay(it), RenderPosition.BEFOREEND);
+    });
+
+    const eventListByDay = container.querySelectorAll(`.day`);
+
+    eventListByDay.forEach((it) => {
+      render(it, new EventsListComponent(), RenderPosition.BEFOREEND);
+    });
+
+    const eventList = container.querySelectorAll(`.trip-events__list`);
+
+    events.forEach((event, i) => {
+      event.points.map((point) => {
+        renderEvent(eventList[i], point);
+      });
+    });
+
+    // Если нет точек маршрута:
+    const event = container.querySelector(`.trip-days__item `);
+    const isNoEventsCreated = event === null || event === undefined;
+
+    if (isNoEventsCreated) {
+      render(container, this._noEventsComponent, RenderPosition.BEFOREEND);
+    }
   }
 }
