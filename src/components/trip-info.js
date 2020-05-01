@@ -1,4 +1,6 @@
-export const createTripInfo = () => {
+import AbstractComponent from "./abstract-component.js";
+
+const createTripInfoTemplate = () => {
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
@@ -13,3 +15,9 @@ export const createTripInfo = () => {
     </section>`
   );
 };
+
+export default class TripInfo extends AbstractComponent {
+  getTemplate() {
+    return createTripInfoTemplate();
+  }
+}
