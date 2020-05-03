@@ -1,17 +1,13 @@
 import EventBoardComponent from "./components/event-board.js";
-import TripController from "./controllers/trip-controller.js";
+import TripController, {tripPoints} from "./controllers/trip-controller.js";
 import TripInfoComponent from "./components/trip-info.js";
 import FilterComponent from "./components/filters.js";
 import MenuComponent from "./components/menu.js";
 import {generateFilters} from "./mock/filter.js";
-import {generateTripPoints} from "./mock/trip-point.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {MONTH_NAMES} from "./const.js";
 
 const filters = generateFilters();
-
-const TRIP_POINT_COUNT = 20;
-const tripPoints = generateTripPoints(TRIP_POINT_COUNT);
 
 // Создает объект, где ключ - дата, значение - массив с точками подходящей даты
 const tripPointList = tripPoints.sort((a, b) => a.tripDate - b.tripDate)
