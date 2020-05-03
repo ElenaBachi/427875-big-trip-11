@@ -1,5 +1,5 @@
 import EventBoardComponent from "./components/event-board.js";
-import TripController, {tripPoints} from "./controllers/trip-controller.js";
+import TripController, {tripPoints} from "./controllers/trip.js";
 import TripInfoComponent from "./components/trip-info.js";
 import FilterComponent from "./components/filters.js";
 import MenuComponent from "./components/menu.js";
