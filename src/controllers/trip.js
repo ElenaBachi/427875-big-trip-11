@@ -56,7 +56,7 @@ const renderDefaultEvents = (eventList, events) => {
 
 const getSortedEvents = (events, sortType) => {
   let sortedEvents = [];
-  const eventsToSort = tripPoints;
+  const eventsToSort = tripPoints.slice();
   const defaultEvents = events.slice();
 
   switch (sortType) {
