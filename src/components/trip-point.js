@@ -1,13 +1,11 @@
 import AbstractComponent from "./abstract-component.js";
 import {stopTypes} from "../const.js";
-import {generateDurationTime, formatTime, makeDatetime} from "../utils/common.js";
+import {formatTime, makeDatetime} from "../utils/common.js";
 
 const createTripPointTemplate = (tripPoint) => {
-  const {tripType, tripPrice, destination, timeFrom, timeTo, offer} = tripPoint;
+  const {tripType, tripPrice, destination, timeFrom, timeTo, duration, offer} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
-
-  const duration = generateDurationTime(timeFrom, timeTo);
 
   return (
     `<li class="trip-events__item">

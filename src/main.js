@@ -1,28 +1,24 @@
 import EventBoardComponent from "./components/event-board.js";
-import EventBoardController from "./controllers/event-board.js";
+import TripController, {tripPoints} from "./controllers/trip.js";
 import TripInfoComponent from "./components/trip-info.js";
 import FilterComponent from "./components/filters.js";
 import MenuComponent from "./components/menu.js";
 import {generateFilters} from "./mock/filter.js";
-import {generateTripPoints} from "./mock/trip-point.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {MONTH_NAMES} from "./const.js";
 
 const filters = generateFilters();
 
-const TRIP_POINT_COUNT = 20;
-const tripPoints = generateTripPoints(TRIP_POINT_COUNT);
-
 // Создает объект, где ключ - дата, значение - массив с точками подходящей даты
 const tripPointList = tripPoints.sort((a, b) => a.tripDate - b.tripDate)
-.reduce((accumulator, it) => {
+.reduce((acc, it) => {
   const time = `${MONTH_NAMES[it.tripDate.getMonth()]} ${it.tripDate.getDate()}`;
-  if (!accumulator[time]) {
-    accumulator[time] = [];
+  if (!acc[time]) {
+    acc[time] = [];
   }
-  accumulator[time].push(it);
+  acc[time].push(it);
 
-  return accumulator;
+  return acc;
 }, {});
 
 // Создает массив, где каждый элемент - объект, ключи: порядковый номер, дата, точки маршрута
@@ -49,6 +45,6 @@ render(siteMainMenu, new FilterComponent(filters), RenderPosition.AFTERBEGIN);
 render(siteMainMenu, new MenuComponent(), RenderPosition.AFTERBEGIN);
 
 const eventBoardComponent = new EventBoardComponent();
-const eventBoardController = new EventBoardController(eventBoardComponent);
+const eventBoardController = new TripController(eventBoardComponent);
 render(pageBodyContainer, eventBoardComponent, RenderPosition.BEFOREEND);
 eventBoardController.render(groupTripPoints);
