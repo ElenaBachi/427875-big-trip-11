@@ -1,22 +1,9 @@
 import {getRandomIntegerNumber, getRandomArrayElement, getRandomArrayLength, generateImgGallery, getRandomTime, getRandomDate, generateDurationTime} from "../utils/common.js";
-import {offers} from "../const.js";
+import {OFFERS, DescriptionItems} from "../const.js";
 
 const TripTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
 const Destinations = [`Amsterdam`, `Geneva`, `Charmonix`, `Saint-Petersburg`];
-
-const DescriptionItems = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-  `Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.`,
-  `In rutrum ac purus sit amet tempus.`
-];
 
 const price = {
   min: 0,
@@ -29,26 +16,37 @@ const getEndTime = (time) => {
   return timeTo;
 };
 
+const generateRandomOfferList = (offerList) => {
+  const randomNum = getRandomIntegerNumber(1, 5);
+  const randomOfferList = offerList.slice(0, randomNum);
+
+  return randomOfferList;
+};
+
 const generateTripPoint = () => {
+  const tripType = getRandomArrayElement(TripTypes);
   const timeFrom = getRandomTime();
   const timeTo = getEndTime(timeFrom);
   const duration = generateDurationTime(timeFrom, timeTo);
+  const destination = {
+    city: getRandomArrayElement(Destinations),
+    description: getRandomArrayLength(DescriptionItems),
+    photos: generateImgGallery(getRandomIntegerNumber(1, 10)),
+  };
+
   return {
-    tripType: getRandomArrayElement(TripTypes),
+    tripType,
     tripPrice: getRandomIntegerNumber(price.min, price.max),
-    destination: {
-      city: getRandomArrayElement(Destinations),
-      description: getRandomArrayLength(DescriptionItems),
-      photos: generateImgGallery(getRandomIntegerNumber(1, 10)),
-    },
+    destination,
     tripDate: getRandomDate(),
     timeFrom,
     timeTo,
     duration,
     isFavorite: Math.random() > 0.5,
-    offer: getRandomArrayElement(offers),
+    offers: generateRandomOfferList(OFFERS[tripType]),
   };
 };
+
 
 const generateTripPoints = (count) => {
   return new Array(count).fill(``).map(generateTripPoint);

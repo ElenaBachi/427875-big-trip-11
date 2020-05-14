@@ -2,10 +2,23 @@ import AbstractComponent from "./abstract-component.js";
 import {stopTypes} from "../const.js";
 import {formatTime, makeDatetime} from "../utils/common.js";
 
+const createOfferMarkup = (offer) => {
+  const {title, price} = offer;
+  return (
+    `<li class="event__offer">
+      <span class="event__offer-title">${title}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${price}</span>
+    </li>`
+  );
+};
+
 const createTripPointTemplate = (tripPoint) => {
-  const {tripType, tripPrice, destination, timeFrom, timeTo, duration, offer} = tripPoint;
+  const {tripType, tripPrice, destination, timeFrom, timeTo, duration, offers} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
+  const createOffersMarkup = () => offers.map(createOfferMarkup).join(``);
+  const offersMarkup = createOffersMarkup();
 
   return (
     `<li class="trip-events__item">
@@ -30,11 +43,7 @@ const createTripPointTemplate = (tripPoint) => {
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          <li class="event__offer">
-            <span class="event__offer-title">${offer.title}</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-          </li>
+          ${offersMarkup}
         </ul>
 
         <button class="event__rollup-btn" type="button">
