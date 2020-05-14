@@ -6,7 +6,7 @@ const createEventsContainerTemplate = () => {
   );
 };
 
-export default class EventsContainer extends AbstractComponent {
+export default class EventContainer extends AbstractComponent {
   getTemplate() {
     return createEventsContainerTemplate();
   }

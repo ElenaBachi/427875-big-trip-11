@@ -1,6 +1,6 @@
-import AbstractComponent from "./abstract-component.js";
-import {eventTypes, stopTypes, offers} from "../const.js";
-import {formatTime, formatDate} from "../utils/common.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
+import {OFFERS, DescriptionItems, eventTypes, stopTypes} from "../const.js";
+import {formatTime, formatDate, getRandomIntegerNumber, getRandomArrayLength, generateImgGallery} from "../utils/common.js";
 
 const createTripTypesMarkup = (tripTypes) => {
   return tripTypes
@@ -26,26 +26,37 @@ const createEventStopMarkup = (tripTypes) => {
   }).join(`\n`);
 };
 
-const createOfferListMarkup = (availableOffers) => {
-  return availableOffers
-  .map((offer) => {
-    const {name, title, price, selected} = offer;
-    const isOfferChecked = selected ? `checked` : ``;
-    return (
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${isOfferChecked}>
-        <label class="event__offer-label" for="event-offer-${name}-1">
-          <span class="event__offer-title">${title}</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">${price}</span>
-        </label>
-      </div>`
-    );
-  }).join(`\n`);
+const createOfferListMarkup = (offer) => {
+  const {name, title, price, selected} = offer;
+  const isOfferChecked = selected ? `checked` : ``;
+  return (
+    `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${isOfferChecked}>
+      <label class="event__offer-label" for="event-offer-${name}-1">
+        <span class="event__offer-title">${title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${price}</span>
+      </label>
+    </div>`
+  );
+};
+
+const createDestinationMarkup = (destination) => {
+  return (
+    `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${destination.description}</p>
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${destination.photos}
+        </div>
+      </div>
+    </section>`
+  );
 };
 
 const createTripPointEditTemplate = (tripPoint) => {
-  const {destination, tripDate, tripType, tripPrice, isFavorite} = tripPoint;
+  const {destination, tripDate, tripType, tripPrice, offers, isFavorite} = tripPoint;
 
   const date = formatDate(tripDate);
   const time = formatTime(tripDate);
@@ -55,7 +66,8 @@ const createTripPointEditTemplate = (tripPoint) => {
 
   const tripTypesMarkup = createTripTypesMarkup(eventTypes);
   const eventStopMarkup = createEventStopMarkup(stopTypes);
-  const offerListMarkup = createOfferListMarkup(offers);
+  const offerListMarkup = offers.map(createOfferListMarkup).join(`\n`);
+  const destinationMarkup = destination === `` ? `` : createDestinationMarkup(destination);
   const isOfferCreated = offerListMarkup;
 
   return (
@@ -134,28 +146,93 @@ const createTripPointEditTemplate = (tripPoint) => {
       ${isOfferCreated ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
         <div class="event__available-offers">
         ${offerListMarkup}
         </div>
       </section>` : ``}
+      ${destinationMarkup}
     </section>
   </form>`
   );
 };
 
-export default class TripPointEdit extends AbstractComponent {
-  constructor(task) {
+export default class TripPointEdit extends AbstractSmartComponent {
+  constructor(event) {
     super();
 
-    this._task = task;
+    this._event = event;
+
+    this._eventType = this._event.tripType;
+    this._eventOffers = this._event.offers;
+
+    this._destination = this._event.destination;
+
+    this._submitHandler = null;
+    this._favoriteButtonHandler = null;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createTripPointEditTemplate(this._task);
+    return createTripPointEditTemplate(this._event);
   }
 
-  setSubmitHandler(cb) {
-    this.getElement().addEventListener(`submit`, cb);
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setFavoritesButtonClickHandler(this._favoriteButtonHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    const event = this._event;
+    this._eventType = event.tripType;
+    this._eventOffers = event.offers;
+    this._destination = event.destination;
+
+    this.rerender();
+  }
+
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
+
+    this._submitHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`click`, handler);
+
+    this._favoriteButtonHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    const eventTypeList = element.querySelector(`.event__type-list`);
+    const eventDestination = element.querySelector(`.event__input--destination`);
+
+    eventTypeList.addEventListener(`change`, (evt) => {
+      evt.preventDefault();
+      this._eventType = evt.target.value;
+      this._eventOffers = OFFERS[this._eventType];
+      this.rerender();
+    });
+
+    eventDestination.addEventListener(`input`, (evt) => {
+      evt.preventDefault();
+      const choosedCity = evt.target.value;
+
+      this._destination = {
+        city: choosedCity,
+        description: getRandomArrayLength(DescriptionItems),
+        photos: generateImgGallery(getRandomIntegerNumber(1, 10)),
+      };
+
+      this.rerender();
+    });
   }
 }
