@@ -12,7 +12,7 @@ const filters = generateFilters();
 // Создает объект, где ключ - дата, значение - массив с точками подходящей даты
 const tripPointList = tripPoints.sort((a, b) => a.tripDate - b.tripDate)
 .reduce((acc, it) => {
-  const time = `${MONTH_NAMES[it.tripDate.getMonth()]} ${it.tripDate.getDate()}`;
+  const time = `${MONTH_NAMES[it.timeFrom.getMonth()]} ${it.timeFrom.getDate()}`;
   if (!acc[time]) {
     acc[time] = [];
   }

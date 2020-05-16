@@ -1,14 +1,18 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {OFFERS, DescriptionItems, eventTypes, stopTypes} from "../const.js";
-import {formatTime, formatDate, getRandomIntegerNumber, getRandomArrayLength, generateImgGallery} from "../utils/common.js";
+import {capitalize, formatTime, formatDate, getRandomIntegerNumber, getRandomArrayLength, generateImgGallery} from "../utils/common.js";
+
+import flatpickr from "flatpickr";
+
+import "flatpickr/dist/flatpickr.min.css";
 
 const createTripTypesMarkup = (tripTypes) => {
   return tripTypes
   .map((tripType, index) => {
     return (
       `<div class="event__type-item">
-        <input id="event-type-${tripType.toLowerCase()}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${tripType.toLowerCase()}">
-        <label class="event__type-label  event__type-label--${tripType.toLowerCase()}" for="event-type-${tripType.toLowerCase()}-${index}">${tripType}</label>
+        <input id="event-type-${tripType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${tripType}">
+        <label class="event__type-label  event__type-label--${tripType}" for="event-type-${tripType}-${index}">${tripType}</label>
       </div>`
     );
   }).join(`\n`);
@@ -19,8 +23,8 @@ const createEventStopMarkup = (tripTypes) => {
   .map((tripType, index) => {
     return (
       `<div class="event__type-item">
-        <input id="event-type-${tripType.toLowerCase()}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${tripType.toLowerCase()}">
-        <label class="event__type-label  event__type-label--${tripType.toLowerCase()}" for="event-type-${tripType.toLowerCase()}-${index}">${tripType}</label>
+        <input id="event-type-${tripType}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${tripType}">
+        <label class="event__type-label  event__type-label--${tripType}" for="event-type-${tripType}-${index}">${tripType}</label>
     </div>`
     );
   }).join(`\n`);
@@ -56,10 +60,7 @@ const createDestinationMarkup = (destination) => {
 };
 
 const createTripPointEditTemplate = (tripPoint) => {
-  const {destination, tripDate, tripType, tripPrice, offers, isFavorite} = tripPoint;
-
-  const date = formatDate(tripDate);
-  const time = formatTime(tripDate);
+  const {destination, timeFrom, timeTo, tripType, tripPrice, offers, isFavorite} = tripPoint;
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
   const favoriteButton = isFavorite ? `checked` : ``;
@@ -76,7 +77,7 @@ const createTripPointEditTemplate = (tripPoint) => {
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${tripType.toLowerCase()}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${tripType}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -95,7 +96,7 @@ const createTripPointEditTemplate = (tripPoint) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-        ${tripType} ${isStopEvent}
+        ${capitalize(tripType)} ${isStopEvent}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.city}" list="destination-list-1">
         <datalist id="destination-list-1">
@@ -110,12 +111,12 @@ const createTripPointEditTemplate = (tripPoint) => {
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${date} ${time}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${timeFrom} ${formatTime(timeFrom)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${date} ${time}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(timeTo)} ${formatTime(timeTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -167,9 +168,11 @@ export default class TripPointEdit extends AbstractSmartComponent {
 
     this._destination = this._event.destination;
 
+    this._flatpickr = null;
     this._submitHandler = null;
     this._favoriteButtonHandler = null;
 
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -185,6 +188,8 @@ export default class TripPointEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -194,6 +199,22 @@ export default class TripPointEdit extends AbstractSmartComponent {
     this._destination = event.destination;
 
     this.rerender();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const dateElements = this.getElement().querySelectorAll(`.event__input--time`);
+    dateElements.forEach((it) => {
+      this._flatpickr = flatpickr(it, {
+        altInput: true,
+        allowInput: true,
+        dateFormat: `YYYY/MM/DD H:i`,
+      });
+    });
   }
 
   setSubmitHandler(handler) {
@@ -216,14 +237,12 @@ export default class TripPointEdit extends AbstractSmartComponent {
     const eventDestination = element.querySelector(`.event__input--destination`);
 
     eventTypeList.addEventListener(`change`, (evt) => {
-      evt.preventDefault();
       this._eventType = evt.target.value;
       this._eventOffers = OFFERS[this._eventType];
       this.rerender();
     });
 
-    eventDestination.addEventListener(`input`, (evt) => {
-      evt.preventDefault();
+    eventDestination.addEventListener(`change`, (evt) => {
       const choosedCity = evt.target.value;
 
       this._destination = {

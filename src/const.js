@@ -1,5 +1,5 @@
-export const eventTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`];
-export const stopTypes = [`Check-in`, `Sightseeing`, `Restaurant`];
+export const eventTypes = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+export const stopTypes = [`check-in`, `sightseeing`, `restaurant`];
 
 export const MONTH_NAMES = [
   `JAN`,
@@ -17,7 +17,7 @@ export const MONTH_NAMES = [
 ];
 
 export const OFFERS = {
-  'Taxi': [{
+  'taxi': [{
     name: `uber`,
     title: `Order Uber`,
     price: 20,
@@ -29,7 +29,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Bus': [{
+  'bus': [{
     name: `comfort`,
     title: `Switch to comfort class`,
     price: 100,
@@ -41,7 +41,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Train': [{
+  'train': [{
     name: `train`,
     title: `Travel by train`,
     price: 40,
@@ -58,7 +58,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Ship': [{
+  'ship': [{
     name: `seats`,
     title: `Choose seats`,
     price: 5,
@@ -75,7 +75,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Transport': [{
+  'transport': [{
     name: `uber`,
     title: `Order Uber`,
     price: 20,
@@ -92,14 +92,14 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Drive': [{
+  'drive': [{
     name: `car`,
     title: `Rent a car`,
     price: 200,
     selected: Math.random() > 0.5,
   }],
 
-  'Flight': [{
+  'flight': [{
     name: `tickets`,
     title: `Book tickets`,
     price: 40,
@@ -116,7 +116,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Check-in': [{
+  'check-in': [{
     name: `luggage`,
     title: `Add luggage`,
     price: 30,
@@ -128,7 +128,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Sightseeing': [{
+  'sightseeing': [{
     name: `tickets`,
     title: `Book tickets`,
     price: 40,
@@ -140,7 +140,7 @@ export const OFFERS = {
     selected: Math.random() > 0.5,
   }],
 
-  'Restaurant': [{
+  'restaurant': [{
     name: `meal`,
     title: `Add meal`,
     price: 15,

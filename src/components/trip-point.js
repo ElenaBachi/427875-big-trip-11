@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
 import {stopTypes} from "../const.js";
-import {formatTime, makeDatetime} from "../utils/common.js";
+import {capitalize, formatTime, makeDatetime} from "../utils/common.js";
 
 const createOfferMarkup = (offer) => {
   const {title, price} = offer;
@@ -24,9 +24,9 @@ const createTripPointTemplate = (tripPoint) => {
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${tripType.toLowerCase()}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${tripType}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${tripType} ${isStopEvent} ${destination.city}</h3>
+        <h3 class="event__title">${capitalize(tripType)} ${isStopEvent} ${destination.city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">

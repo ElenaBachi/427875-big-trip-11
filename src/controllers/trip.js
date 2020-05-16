@@ -57,9 +57,9 @@ export default class TripController {
       render(container, eventListByDay, RenderPosition.BEFOREEND);
       render(eventListByDay.getElement(), eventsList, RenderPosition.BEFOREEND);
 
-      const pointController = new PointController(eventsList.getElement(), this._onDataChange, this._onViewChange);
-
       event.points.map((point) => {
+        const pointController = new PointController(eventsList.getElement(), this._onDataChange, this._onViewChange);
+
         pointController.render(point);
         this._showedEventControllers = this._showedEventControllers.concat(pointController);
       });
