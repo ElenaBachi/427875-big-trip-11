@@ -1,6 +1,7 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {OFFERS, DescriptionItems, eventTypes, stopTypes} from "../const.js";
-import {capitalize, formatTime, formatDate, getRandomIntegerNumber, getRandomArrayLength, generateImgGallery} from "../utils/common.js";
+import {capitalize, formatTime, formatDate, getRandomIntegerNumber, getRandomArrayLength, generateImgGallery, generateDurationTime} from "../utils/common.js";
+import {EmptyPoint} from "../controllers/point.js";
 
 import flatpickr from "flatpickr";
 
@@ -67,9 +68,14 @@ const createTripPointEditTemplate = (tripPoint) => {
 
   const tripTypesMarkup = createTripTypesMarkup(eventTypes);
   const eventStopMarkup = createEventStopMarkup(stopTypes);
-  const offerListMarkup = offers.map(createOfferListMarkup).join(`\n`);
+  const offerListMarkup = offers !== null ? offers.map(createOfferListMarkup).join(`\n`) : ``;
   const destinationMarkup = destination === `` ? `` : createDestinationMarkup(destination);
-  const isOfferCreated = offerListMarkup;
+
+  let newPoint = false;
+
+  if (tripPoint === EmptyPoint) {
+    newPoint = true;
+  }
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -128,9 +134,9 @@ const createTripPointEditTemplate = (tripPoint) => {
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__reset-btn" type="reset">${newPoint ? `Cancel` : `Delete`}</button>
 
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favoriteButton}>
+      <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${favoriteButton}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -138,23 +144,55 @@ const createTripPointEditTemplate = (tripPoint) => {
         </svg>
       </label>
 
-      <button class="event__rollup-btn" type="button">
+      ${newPoint ? `` :
+      `<button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
-      </button>
+      </button>`}
     </header>
 
     <section class="event__details">
-      ${isOfferCreated ?
+      ${offers === null ? `` :
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
         ${offerListMarkup}
         </div>
-      </section>` : ``}
-      ${destinationMarkup}
+      </section>`}
+      ${destination.description === undefined ? `` : destinationMarkup}
     </section>
   </form>`
   );
+};
+
+const parseFormData = (formData, form) => {
+  const tripType = formData.get(`event-type`);
+  const timeFrom = formData.get(`event-start-time`);
+  const timeTo = formData.get(`event-end-time`);
+  const duration = generateDurationTime(timeFrom, timeTo);
+  const destination = {
+    city: formData.get(`event-destination`),
+    description: document.querySelector(`.event__destination-description`).textContent,
+    photos: document.querySelectorAll(`.event__photo`),
+  };
+  let offers = Array.from(form.querySelectorAll(`.event__offer-selector`));
+  offers.map((offer) => {
+    return {
+      name: offer.querySelector(`[name="event-offer-${name}"]`),
+      title: offer.querySelector(`.event__offer-title`).textContent,
+      price: offer.querySelector(`.event__offer-price`).textContent,
+    };
+  });
+
+  return {
+    tripType,
+    timeFrom,
+    timeTo,
+    duration,
+    destination,
+    offers,
+    tripPrice: formData.get(`event-price`),
+    isFavorite: formData.get(`event-favorite`),
+  };
 };
 
 export default class TripPointEdit extends AbstractSmartComponent {
@@ -168,9 +206,12 @@ export default class TripPointEdit extends AbstractSmartComponent {
 
     this._destination = this._event.destination;
 
-    this._flatpickr = null;
+    this._flatpickrFrom = null;
+    this._flatpickrTo = null;
     this._submitHandler = null;
     this._favoriteButtonHandler = null;
+    this._deleteButtonClickHandler = null;
+    this._addDataClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -180,9 +221,22 @@ export default class TripPointEdit extends AbstractSmartComponent {
     return createTripPointEditTemplate(this._event);
   }
 
+  removeElement() {
+    if (this._flatpickrFrom || this._flatpickrTo) {
+      this._flatpickrFrom.destroy();
+      this._flatpickrTo.destroy();
+      this._flatpickrFrom = null;
+      this._flatpickrTo = null;
+    }
+
+    super.removeElement();
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setAddDataClickHandler(this._addDataClickHandler);
     this.setFavoritesButtonClickHandler(this._favoriteButtonHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -202,25 +256,60 @@ export default class TripPointEdit extends AbstractSmartComponent {
   }
 
   _applyFlatpickr() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
+    const dateStartElement = this.getElement().querySelector(`#event-start-time-1`);
+    const dateEndElement = this.getElement().querySelector(`#event-end-time-1`);
+
+    if (this._flatpickrFrom || this._flatpickrTo) {
+      this._flatpickrFrom.destroy();
+      this._flatpickrTo.destroy();
+      this._flatpickrFrom = null;
+      this._flatpickrTo = null;
     }
 
-    const dateElements = this.getElement().querySelectorAll(`.event__input--time`);
-    dateElements.forEach((it) => {
-      this._flatpickr = flatpickr(it, {
-        altInput: true,
-        allowInput: true,
-        dateFormat: `YYYY/MM/DD H:i`,
-      });
+    this._flatpickrFrom = flatpickr(dateStartElement, {
+      enableTime: true,
+      altInput: true,
+      allowInput: true,
+      dateFormat: `DD/MM/YYY hh:mm`,
     });
+
+    this._flatpickrTo = flatpickr(dateEndElement, {
+      enableTime: true,
+      altInput: true,
+      allowInput: true,
+      dateFormat: `DD/MM/YYY hh:mm`,
+    });
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData, form);
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
 
     this._submitHandler = handler;
+  }
+
+  setAddDataClickHandler(handler) {
+    const openEventBtn = this.getElement().querySelector(`.event__rollup-btn`);
+
+    if (!openEventBtn) {
+      return;
+    }
+
+    openEventBtn.addEventListener(`click`, handler);
+    this._addDataClickHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+
+    this._deleteButtonClickHandler = handler;
   }
 
   setFavoritesButtonClickHandler(handler) {
@@ -237,8 +326,9 @@ export default class TripPointEdit extends AbstractSmartComponent {
     const eventDestination = element.querySelector(`.event__input--destination`);
 
     eventTypeList.addEventListener(`change`, (evt) => {
-      this._eventType = evt.target.value;
-      this._eventOffers = OFFERS[this._eventType];
+      const targetValue = evt.target.value;
+      this._eventType = targetValue;
+      this._eventOffers = OFFERS[targetValue];
       this.rerender();
     });
 

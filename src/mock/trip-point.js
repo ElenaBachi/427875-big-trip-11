@@ -35,6 +35,7 @@ const generateTripPoint = () => {
   };
 
   return {
+    id: String(timeFrom + Math.random()),
     tripType,
     tripPrice: getRandomIntegerNumber(price.min, price.max),
     destination,

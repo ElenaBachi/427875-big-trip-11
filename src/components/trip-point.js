@@ -18,7 +18,7 @@ const createTripPointTemplate = (tripPoint) => {
 
   const isStopEvent = stopTypes.includes(tripType) ? `in` : `to`;
   const createOffersMarkup = () => offers.map(createOfferMarkup).join(``);
-  const offersMarkup = createOffersMarkup();
+  const offersMarkup = offers !== null ? createOffersMarkup() : ``;
 
   return (
     `<li class="trip-events__item">
@@ -42,9 +42,10 @@ const createTripPointTemplate = (tripPoint) => {
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>
-        <ul class="event__selected-offers">
+        ${offers !== null ?
+        `<ul class="event__selected-offers">
           ${offersMarkup}
-        </ul>
+        </ul>` : ``}
 
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>

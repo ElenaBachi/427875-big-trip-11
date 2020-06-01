@@ -16,6 +16,12 @@ export const MONTH_NAMES = [
   `DEC`,
 ];
 
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`,
+};
+
 export const OFFERS = {
   'taxi': [{
     name: `uber`,
